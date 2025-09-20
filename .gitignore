@@ -1,0 +1,27 @@
+# Carpetas de Python
+__pycache__/
+*.py[cod]
+*.egg-info/ 
+.env/
+
+# Entorno virtual
+venv/
+env/
+.vscode/
+.plataforma-educacion-terciario-ISFT-200/
+envProyectoEscuela
+
+# Archivos de configuración
+*.log
+*.sqlite3
+.DS_Store
+
+# Archivos de Jupyter
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# Archivos sensibles
+.env
+secrets.json
