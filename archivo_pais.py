@@ -19,9 +19,9 @@ class Pais:
         return df_pais
     
     def obtener_paises_filtro(self): # <--metodo de obtencion de paises filtrados.
-        query = "SELECT FROM pais WHERE (nombre_pais ) = (?)"
-        df_pais_filtrado = self.conn.execute(query)
-        self.conn.commit()
+        query = "SELECT FROM pais WHERE (nombre_pais) = (?)"
+        df_pais_filtrado = self.conn.execute(query).fetch_df() # --> devuelve los datos en forma de datafreme.
+        self.conn.commit() # --> colocar con los C.R.U.D.
         return df_pais_filtrado
         
 

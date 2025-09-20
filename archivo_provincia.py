@@ -115,7 +115,7 @@ class ComponentesProvincia():
         if enviar_busqueda:
             if lbl_busqueda_pais:
                 pais = self.db_pais.obtener_paises_filtro()   
-                st.write(f"Resultados para: {pais}")
+                st.write(f"Pais Selccionado --> {pais}")
                 
             elif lbl_busqueda_provincia:
                 provincia = ComponentesProvincia.visualizar_provincias_filtrada()
