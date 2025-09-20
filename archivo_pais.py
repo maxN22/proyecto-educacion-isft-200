@@ -2,82 +2,106 @@ import duckdb
 import pandas as pd
 import streamlit as st
 import os
-
-# notas.
-# DML = AGREGAR, EDITAR, ELIMINAR DATOS. (MODIFICAR EL CONTENIDO DE LA BASE DE DATOS).
-# DDL = CREAR, MODIFICAR, ELIMINAR, COPIAR TABLA (MODIFICA EL FORMATO, NO EL CONTENIDO).
-# DQL = PARA SELCCIONAR, O FILTRAR DATOS. 
+from dotenv import load_dotenv
+import time
 
 
-# Clase para manejar la conexión y operaciones con la tabla 'pais'.
+# Clase para manejar la conexión y operaciones con la tabla 'pais'
 class Pais:
-    def __init__(self, ruta_db ='db_educacion.duckdb'):
+    def __init__(self, ruta_db = 'repositorio/db_educacion.duckdb'):
         self.ruta_db = ruta_db
-        self.conn = duckdb.connect(database = self.ruta_db) # realizamos conexion a la base de datos.
+        self.conn = duckdb.connect(database = self.ruta_db)
 
     def obtener_paises(self):
-        query = "SELECT id_pais as 'ID País', nombre_pais as 'Nombre' FROM pais" # DQL.
-        df = self.conn.execute(query).fetchdf() #  devuelve los datos de forma tabular (tabla con filas y columnas)en dataframe.
-        return df
-
-
-    def insertar_pais(self, nombre_pais):
-        query = "INSERT INTO pais (nombre_pais) VALUES (?)" # agregamos valores a la tabla.
-        self.conn.execute(query,(nombre_pais,)) 
-        self.conn.commit() # CONFIRMA LA EJECUCION. se coloca con los C.R.U.D
-
-
-    def actualizar_pais(self, nombre_pais, id_pais):
-        query = "UPDATE pais SET nombre_pais = ? WHERE id_pais = ?" # actualizamos valores a la tabla.
-        self.conn.execute(query,(nombre_pais, id_pais)) 
-        self.conn.commit() # CONFIRMA LA EJECUCION. se coloca con los C.R.U.D
-
-# clase Vista.
-class ComponentesPais:  # la clase lleva las clases van en parentesis cuando se herdan es un.
-
-    def __init__(self):
-        self.db = Pais() # es un objeto o  INSTANCIA PERO NO UNA HERENCIA DE LA CALSE Pais. el OBJETO ES LA COSA EN SI DE LA CALSE.
-
-    def visualizar_paises(self):
-        df_paises = self.db.obtener_paises() # self.db es una instancia de pais por lo tanto hereda los metodos.
-        if df_paises.empty: # chequeamos que no este vacia.
-            st.warning("No hay países registrados en la base de datos.") # ventana de mensaje.
-        else:
-            diccionario_selccion = st.dataframe(df_paises, # <- se aliemntan con los datos del df_paises.
-                                                    height=250, # usamos un alto de 250.
-                                                    use_container_width=True, # usamos el ancho total de la tabla.
-                                                    selection_mode = 'single-row', # casilla de selccion. Especificar modo de selccion.
-                                                    on_select = 'rerun', # se actualiza el buffer de la web.
-                                                    hide_index = 'true') # ocultamos los numero del indice.
+        query = "SELECT id_pais as 'ID País', nombre_pais as 'Nombre' FROM pais"
+        df_pais = self.conn.execute(query).fetch_df()
+        #Se devuelve un DataFrame
+        return df_pais
     
+    def obtener_paises_filtro(self): # <--metodo de obtencion de paises filtrados.
+        query = "SELECT FROM pais WHERE (nombre_pais ) = (?)"
+        df_pais_filtrado = self.conn.execute(query)
+        self.conn.commit()
+        return df_pais_filtrado
+        
 
-    def ingresar_paises(self):
-        with st.form("formulario_pais", clear_on_submit = True): # creamos un formulario const.form. y limpiamos todos los campos
-            st.write("### Registrar País") # titulo del formulario.
-            nombre_pais = st.text_input("Nombre del País", max_chars=50) # text_input es un campo de ingreso de datos
-            if st.form_submit_button("Registrar País"): # creaamos el boton
-                    self.db.insertar_pais(nombre_pais) # metodo insertar y pasamos la variable.
-                    st.rerun() # actualizamos el ingreso de datos a la tabla.
-                    st.success(f"El país {nombre_pais} fue registrado exitosamente.") # mensaje de exito.
-            else:
-                st.error("Por favor, ingrese un nombre de país válido.") # mensaje de error.s
+    def insertar_pais(self, nom_pais):
+        query = "INSERT INTO pais (nombre_pais) VALUES (?)"
+        self.conn.execute(query, (nom_pais,))
+        self.conn.commit()
+
+    def actualizar_pais(self, nom_pais, id_pais):
+        query = "UPDATE pais SET nombre_pais = ? WHERE id_pais = ?"
+        self.conn.execute(query, (nom_pais, id_pais))
+        self.conn.commit()
 
 
-def main_paises(): # genera un objeo pais que sera una instancia de pais.
+class ComponentesPais:
+    def __init__(self):
+        self.db = Pais()
+
+    @st.dialog('Editar País')
+    def formulario_editar_pais(self, serie_pais):
+        nombre_pais = serie_pais.loc['Nombre']
+        nuevo_nombre_pais = st.text_input('Ingresar nuevo nombre: ', value = nombre_pais, max_chars=50)
+        if st.button('Guardar'):
+            id_pais = int(serie_pais.loc['ID País'])
+            self.db.actualizar_pais(nuevo_nombre_pais,id_pais)
+            st.rerun()
+
+            
+    def visualizar_paises(self):
+        df_paises = self.db.obtener_paises()
+        if df_paises.empty:
+            st.warning("No hay países registrados en la base de datos.")
+        else:
+            diccionario_seleccion =  st.dataframe(df_paises,# Fuente de datos
+                                                height=250,# Largo de la tabla
+                                                use_container_width=True,# Ocupe todo el ancho del contenedor
+                                                selection_mode="single-row",# Especificar si vamos a seleccionar filas o culmnas
+                                                on_select="rerun",# Cada vez que seleccionemos un registro, se actualiza el buffer de la web
+                                                hide_index = True)# Ocultar los números de índice
+        if diccionario_seleccion["selection"]["rows"]:
+            if st.button('Editar'):
+                indice_seleccionado = diccionario_seleccion["selection"]["rows"][0]
+                st.write(indice_seleccionado)
+                serie_pais_seleccionado = df_paises.loc[indice_seleccionado]
+                self.formulario_editar_pais(serie_pais_seleccionado)
+
+# nuevo_objeto_componete_pais = ComponentesPais()
+# nuevo_objeto_componete_pais.visualizar_paises()
+
+    def formulario_ingresar_paises(self):
+        with st.form("formulario_pais", clear_on_submit = True):
+            with st.container(height= 220, border= False):
+                st.write("#### Registrar Nuevo País")
+                nombre_pais = st.text_input("Nombre del País: ", max_chars=50)
+                if st.form_submit_button("Registrar País"):
+                    if nombre_pais:
+                        self.db.insertar_pais(nombre_pais)
+                        st.success(f"El país {nombre_pais} fue registrado exitosamente. 😎")
+                        time.sleep(1.5)
+                        st.rerun()
+                        
+                    else:
+                        st.error("Por favor, ingrese un nombre de país válido.")
+
+def main_paises():
+    st.set_page_config(
+        page_title="Aplicación de Gestión Educativa",
+        layout="wide"
+    )
     objeto_pais = ComponentesPais()
-    _col_formulario, _col_tabla = st.columns(2) # agregamos columnas al formulario.
 
-    with _col_formulario: # llamamos a los metodos. with = dentro de...
-        objeto_pais.ingresar_paises()
-    with _col_tabla:
+    columna_agregar_pais, columna_visualizar_pais =  st.columns([1.5,2])
+
+    with columna_agregar_pais:
+        objeto_pais.formulario_ingresar_paises()
+
+    with columna_visualizar_pais:
         objeto_pais.visualizar_paises()
+    
 
 if __name__ == "__main__":
     main_paises()
-
-
-# para ejecutar el archivo debemos escribir la linea de comando "streamlit run archivo_pais.py"
-# con la combiancion de teclas ctrl + c cerramos la cession.
-
-
 
