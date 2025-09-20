@@ -9,7 +9,7 @@ venv/
 env/
 .vscode/
 .plataforma-educacion-terciario-ISFT-200/
-envProyectoEscuela
+.envProyectoEscuela/
 
 # Archivos de configuración
 *.log

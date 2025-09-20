@@ -10,7 +10,7 @@ con = duckdb.connect("db_educacion.duckdb")
 # Antes las habíamos mezclado con cada tabla, pero ahora las agrupamos al inicio.
 sql_script = """
 -- Secuencias
-CREATE SEQUENCE IF NOT EXISTS sec_pais START 1; 
+CREATE SEQUENCE IF NOT EXISTS sec_pais START 1;
 CREATE SEQUENCE IF NOT EXISTS sec_provincia START 1;
 CREATE SEQUENCE IF NOT EXISTS sec_ciudad START 1;
 CREATE SEQUENCE IF NOT EXISTS sec_calle START 1;
@@ -25,14 +25,13 @@ CREATE SEQUENCE IF NOT EXISTS sec_categoria_nota START 1;
 CREATE SEQUENCE IF NOT EXISTS sec_calificacion START 1;
 
 -- Tablas
-
 CREATE TABLE IF NOT EXISTS pais (
     id_pais INTEGER DEFAULT nextval('sec_pais') PRIMARY KEY,
     nombre_pais VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS provincia_estado (
-    id_provincia INTEGER DEFAULT nextval('sec_provincia') PRIMARY KEY,
+    id_provincia INTEGER DEFAULT nextval('sec_provincia')  PRIMARY KEY,
     nombre_provincia VARCHAR(50) NOT NULL,
     fk_pais INTEGER NOT NULL,
     FOREIGN KEY (fk_pais) REFERENCES pais(id_pais)
@@ -66,7 +65,7 @@ CREATE TABLE IF NOT EXISTS persona (
     apellido_persona VARCHAR(45) NOT NULL,
     dni_persona INTEGER NOT NULL,
     fecha_nac_persona DATE NOT NULL,
-    genero_persona VARCHAR(1) NOT NULL CHECK (genero_persona IN ('M','F','O')),
+    genero_persona VARCHAR(1) NOT NULL CHECK genero_persona IN ('M','F','O')),
     email_persona VARCHAR(60),
     contraseña_persona VARCHAR(70),
     fk_direccion INTEGER NOT NULL,
@@ -185,7 +184,6 @@ CREATE TABLE IF NOT EXISTS calificacion (
     FOREIGN KEY (fk_alumno) REFERENCES alumno(matricula_alumno),
     FOREIGN KEY (fk_categoria) REFERENCES categoria_calificacion(id_categoria)
 );
-
 """
 
 # Ejecutar el script
