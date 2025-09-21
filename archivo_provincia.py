@@ -22,6 +22,11 @@ class Provincia:
                     JOIN pais ON  provincia_estado.fk_pais = pais.id_pais"""
         df_provincia = self.conn.execute(query).fetchdf()
         return df_provincia
+    
+    def obtener_provincias_filtro(self):
+        query = """SELECT * FROM provincia_estado JOIN pais ON provincia_estado.fk_pais = pais.id_pais WHERE provincia_estado.nombre_provincia = ?"""
+        df_provincia = self.conn.execute(query).fetchdf()
+        return df_provincia
 
     def insertar_provincia(self, nombre_provincia, clave_pais):
         query = "Insert into provincia_estado (nombre_provincia, fk_pais) values (?,?)"
@@ -114,10 +119,8 @@ class ComponentesProvincia():
         # condicional de opciones.
         if enviar_busqueda:
             if lbl_busqueda_pais:
-                diccionario_paises = self.db_pais.obtener_paises_filtro()
-                if lbl_busqueda_pais == diccionario_paises:
-                    pais = self.db_pais.obtener_paises_filtro()   
-                    st.write(f"Resultados para: {pais}")
+                pais = self.db_pais.obtener_paises_filtro()   
+                st.write(f"Resultados para: {pais}")
                 
             elif lbl_busqueda_provincia:
                 provincia = ComponentesProvincia.visualizar_provincias_filtrada()
