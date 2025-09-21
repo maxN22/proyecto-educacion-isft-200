@@ -108,51 +108,34 @@ class ComponentesProvincia():
 
     def buscar_provincia_pais(self):
         # Creamos el formulario de busqueda.
-        with st.form(key='form_busqueda', clear_on_submit = True): # --> le agregamos la propiedad clear para que se limpie el form.
-            with st.container(height= 330, border= False):
-                st.title("Busqueda Filtrada por pais y nombre de provincia")
-                lbl_busqueda_pais = st.text_input("Ingresa el pais") 
-                lbl_busqueda_provincia = st.text_input("Ingresa la provincia")
-                
-                # Botón para enviar el formulario
-                enviar_busqueda = st.form_submit_button('Buscar')
-                
-            # condicional de opciones.
-            if enviar_busqueda:
-                # tengo que buscar la manera de que el valor de lbl_busqueda exita en el diccionario de paises. asi lo traigo y almaceno en un variable.
-                if lbl_busqueda_pais:
-                    df_paises = self.db_pais.obtener_paises() 
-                    dict_option = df_paises.to_dict(orient="index") # --> # dict con claves = índice 
+        with st.form(key='form_busqueda'):
+            st.title("Busqueda Filtrada por pais y nombre de provincia")
+            lbl_busqueda_pais = st.text_input("Ingresa el pais: ") 
+            lbl_busqueda_provincia = st.text_input("Ingresa la provincia: ")
 
-                    # --> FORMATO --> dict = {key:expresion <--(lo que quiero obtener) for (key, value) in iterable if condicion}
-                    claves_encontradas = {key: value for key,value in dict_option.items() if "Nombre" in value and lbl_busqueda_pais.lower() == value["Nombre"].lower()}
+            # Botón para enviar el formulario
+            enviar_busqueda = st.form_submit_button('Buscar')
+        
+        # condicional de opciones.
+        if enviar_busqueda:
+            if lbl_busqueda_pais:
+                pais = self.db_pais.obtener_paises_filtro()   
+                st.write(f"Resultados para: {pais}")
                 
-                    if claves_encontradas[0]["Nombre"] == lbl_busqueda_pais:
-                        with st.expander(f"✅ Datos encontrados para --> '{lbl_busqueda_pais}'"):
-                            pais = claves_encontradas # --> Me devuelve los datos del pais buscado. 
-                            st.write(pais)
-                            
-                    else:
-                        st.warning(f"⚠️ No se encontraron resultados para el país '{lbl_busqueda_pais}'.")
-                 
-                elif lbl_busqueda_provincia:
+            elif lbl_busqueda_provincia:
+                provincia = ComponentesProvincia.visualizar_provincias_filtrada()
+                st.write(provincia)
 
-                    if lbl_busqueda_provincia:
-                        df_provincias = self.db_provincia.obtener_provincias() 
-                        dict_option = df_provincias.to_dict(orient="index") # --> # dict con claves = índice 
-                        #st.write(dict_option)
-                        # --> FORMATO --> dict = {key:expresion <--(lo que quiero obtener) for (key, value) in iterable if condicion}
-                        claves_encontradas = {key: value for key,value in dict_option.items() if "Provincia" in value and lbl_busqueda_provincia.lower() == value["Provincia"].lower()}
-                    
-                        if claves_encontradas[0]["Provincia"] == lbl_busqueda_provincia:
-                            with st.expander(f"✅ Datos encontrados para --> '{lbl_busqueda_provincia}'"):
-                                provincia = claves_encontradas # --> Me devuelve los datos del pais buscado. 
-                                st.write(provincia)
-                                
-                        else:
-                            st.warning(f"⚠️ No se encontraron resultados para la provincia '{lbl_busqueda_provincia}'.")
-                           
-                  
+            else:
+                pass
+                
+
+           
+
+        
+
+
+    
 
 
 

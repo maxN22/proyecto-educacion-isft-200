@@ -21,3 +21,7 @@
 > **El metodo obtener_paises_filtro.**
 
 > **Nota:** *Hay una falla ya que se ingresa un pais no cargado en el dataframe se pincha todo.*
+
+
+> Se agrego dentro del archivo_paises.py
+    * El metodo obtener_paises_filtro.
