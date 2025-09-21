@@ -153,14 +153,6 @@ class ComponentesProvincia():
                             st.warning(f"⚠️ No se encontraron resultados para la provincia '{lbl_busqueda_provincia}'.")
                            
                   
-                        
-
-            
-
-        
-
-
-    
 
 
 
