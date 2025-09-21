@@ -8,6 +8,7 @@ import time
 
 # Clase para manejar la conexión y operaciones con la tabla 'pais'
 class Pais:
+
     def __init__(self, ruta_db = 'repositorio/db_educacion.duckdb'):
         self.ruta_db = ruta_db
         self.conn = duckdb.connect(database = self.ruta_db)
@@ -19,16 +20,14 @@ class Pais:
         return df_pais
     
     def obtener_paises_filtro(self): # <--metodo de obtencion de paises filtrados.
-        query = "SELECT FROM pais WHERE (nombre_pais) = (?)"
+        query = "SELECT * FROM pais WHERE pais.nombre_pais = (?)"
         df_pais_filtrado = self.conn.execute(query).fetch_df() # --> devuelve los datos en forma de datafreme.
-        self.conn.commit() # --> colocar con los C.R.U.D.
         return df_pais_filtrado
         
-
     def insertar_pais(self, nom_pais):
         query = "INSERT INTO pais (nombre_pais) VALUES (?)"
         self.conn.execute(query, (nom_pais,))
-        self.conn.commit()
+        self.conn.commit() # --> colocar con los C.R.U.D.
 
     def actualizar_pais(self, nom_pais, id_pais):
         query = "UPDATE pais SET nombre_pais = ? WHERE id_pais = ?"
