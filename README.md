@@ -23,5 +23,20 @@
 > **Nota:** *Hay una falla ya que se ingresa un pais no cargado en el dataframe se pincha todo.*
 
 
+<<<<<<< HEAD
+# Creacion de archivos:
+
+## Carreras.py.
+* **El metodo agregar_carrera.**;
+* **El metodo buscar_carrera.**;
+* **Se creo la clase ComponentesCarrera.**
+
+## Disciplina.py
+* **agregar_disciplina**;
+* **obtener_disciplina**
+* **Se creo la clase ComponentesDisciplina.**
+
+=======
 > Se agrego dentro del archivo_paises.py
     * El metodo obtener_paises_filtro.
+>>>>>>> 7729ec36e73fcbc01a65c58a56b104b0cef2f2aa
