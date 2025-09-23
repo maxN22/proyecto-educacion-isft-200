@@ -8,6 +8,7 @@ import time
 
 # Clase para manejar la conexión y operaciones con la tabla 'pais'
 class Pais:
+
     def __init__(self, ruta_db = 'repositorio/db_educacion.duckdb'):
         self.ruta_db = ruta_db
         self.conn = duckdb.connect(database = self.ruta_db)
@@ -19,16 +20,14 @@ class Pais:
         return df_pais
     
     def obtener_paises_filtro(self): # <--metodo de obtencion de paises filtrados.
-        query = "SELECT FROM pais WHERE (nombre_pais ) = (?)"
-        df_pais_filtrado = self.conn.execute(query)
-        self.conn.commit()
+        query = "SELECT * FROM pais WHERE pais.nombre_pais = (?)"
+        df_pais_filtrado = self.conn.execute(query).fetch_df() # --> devuelve los datos en forma de datafreme.
         return df_pais_filtrado
         
-
     def insertar_pais(self, nom_pais):
         query = "INSERT INTO pais (nombre_pais) VALUES (?)"
         self.conn.execute(query, (nom_pais,))
-        self.conn.commit()
+        self.conn.commit() # --> colocar con los C.R.U.D.
 
     def actualizar_pais(self, nom_pais, id_pais):
         query = "UPDATE pais SET nombre_pais = ? WHERE id_pais = ?"
@@ -41,6 +40,7 @@ class ComponentesPais:
         self.db = Pais()
 
     @st.dialog('Editar País')
+    
     def formulario_editar_pais(self, serie_pais):
         nombre_pais = serie_pais.loc['Nombre']
         nuevo_nombre_pais = st.text_input('Ingresar nuevo nombre: ', value = nombre_pais, max_chars=50)
@@ -76,9 +76,9 @@ class ComponentesPais:
             with st.container(height= 220, border= False):
                 st.write("#### Registrar Nuevo País")
                 nombre_pais = st.text_input("Nombre del País: ", max_chars=50)
-                if st.form_submit_button("Registrar País"):
+                btn_registrar = st.form_submit_button("Registrar País") # dentro del form los botones se crean de este metodo.
+                if btn_registrar:
                     if nombre_pais:
-                        self.db.insertar_pais(nombre_pais)
                         st.success(f"El país {nombre_pais} fue registrado exitosamente. 😎")
                         time.sleep(1.5)
                         st.rerun()
